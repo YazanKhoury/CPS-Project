@@ -46,3 +46,31 @@ ouster-cli source 169.254.41.35 viz
 - Firmware Update
 - Real-Time point cloud shown in Ouster Studio
 
+# Phase 2: RPLIDAR A-Series Setup
+
+Date: 03 November 2025
+
+2.1 Device Detection
+```bash
+ls /dev/ttyUSB*
+```
+
+```bash
+Example: /dev/ttyUSB0
+
+```
+2.2 Visualization Challenge
+
+- The sensor outputs raw serial data but offers no built-in visualization.
+
+2.3 Solution — Custom Python Visualizer
+
+- A 2D scan visualizer was written using Python + Matplotlib to simulate real-time LiDAR output.
+
+2.4 Outcome
+
+-Sensor connected
+-Real-time 2D scan display succeeded
+
+
+
