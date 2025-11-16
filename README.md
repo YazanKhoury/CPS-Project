@@ -18,7 +18,7 @@
 
 ---
 
-# 1. 3D LiDAR: Ouster OS1 Setup                **Date:** 03.11.2025 
+# 1. 3D LiDAR: Ouster OS1 Setup      
 **Date:** 03.11.2025  
 
 - **Objective:** Connect and visualize the Ouster OS1 3D LiDAR.  
