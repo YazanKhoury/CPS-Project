@@ -48,3 +48,19 @@
 ```bash
 ouster-cli discover   # find sensor IP
 ip a                  # find Ethernet port (e.g., eno1)
+```
+**Step 2: Configure Host Network
+``` bash
+sudo ip addr add 169.254.41.100/16 dev eno1
+```
+***Step 3: Open Firewall Ports
+```bash
+sudo ufw allow 7502/udp
+sudo ufw allow 7503/udp
+```
+Step 4: Connect to Sensor
+```bash
+ouster-cli source 169.254.41.35 viz
+```
+###Outcome:
+- Connection established successfully, 3D point cloud visualized, firmware updated, Ouster Studio used.
