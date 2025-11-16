@@ -1,4 +1,4 @@
-# 🚀 CPS Project Log: LiDAR & RGB-D Sensor Setup
+# CPS Project Log: LiDAR & RGB-D Sensor Setup
 
 **Ouster OS1 • RPLIDAR A-Series • Orbbec RGB-D • ROS2 Jazzy • SLAM • Bag Recording**
 
