@@ -53,7 +53,7 @@ Step 2: Configure Host Network
 ``` bash
 sudo ip addr add 169.254.41.100/16 dev eno1
 ```
-***Step 3: Open Firewall Ports
+Step 3: Open Firewall Ports
 ```bash
 sudo ufw allow 7502/udp
 sudo ufw allow 7503/udp
@@ -204,7 +204,7 @@ ros2 bag record \
   /tf_static
 ```
 ## 7.4 Run SLAM
-**Terminal 1: Play bag
+Terminal 1: Play bag
 ```bash
 ros2 bag play <new_bag_name> --clock --loop
 ```
