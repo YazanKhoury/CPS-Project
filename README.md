@@ -44,12 +44,12 @@
 
 ### 2.2 Solution: Step-by-Step
 
-**Step 1: Identify Sensor IP & Ethernet Port**
+Step 1: Identify Sensor IP & Ethernet Port**
 ```bash
 ouster-cli discover   # find sensor IP
 ip a                  # find Ethernet port (e.g., eno1)
 ```
-**Step 2: Configure Host Network
+Step 2: Configure Host Network
 ``` bash
 sudo ip addr add 169.254.41.100/16 dev eno1
 ```
