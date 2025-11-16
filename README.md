@@ -88,7 +88,7 @@ ls /dev/ttyUSB*
 # 4. Orbbec RGB-D Camera Setup (ROS2 Jazzy)
 Date: 11.11.2025
 
-##4.1 Hardware Setup
+## 4.1 Hardware Setup
 - Connected Orbbec RGB-D camera via USB-C.
 - Device recognized successfully.
 
@@ -180,7 +180,7 @@ ros2 bag play <bag_folder_name>
 # 7. RGB-D Camera SLAM Debugging & Bag Reconstruction
 Date: 13.11.2025
 
-##7.1 Initial Problem
+## 7.1 Initial Problem
 Odometry node crashed due to RGB-depth resolution mismatch:
 ```Scale-MissMatch
 RGB: 1280x720
@@ -208,7 +208,7 @@ ros2 bag record \
 ```bash
 ros2 bag play <new_bag_name> --clock --loop
 ```
-**Terminal 2: Launch RTAB-Map
+### Terminal 2: Launch RTAB-Map
 ```bash
 ros2 launch rtabmap_launch rtabmap.launch.py \
   use_sim_time:=true \
