@@ -326,4 +326,5 @@ The synchronization errors make them **mathematically unusable** for 3D mapping.
  - Disables software hacks
  - Fully trusts the camera’s internal clock
 
+Date: December 27, 2025
 ---
