@@ -462,3 +462,77 @@ The system was refactored into **two independent ROS 2 nodes**, each running in 
 ```bash
 source .venv/bin/activate
 
+```
+Step 1: Launch the Core System (Terminal 1)
+
+This starts the “Brain” and “Eyes” of the robot:
+```bash
+ros2 launch launch/real_robot.launch.py
+```
+Verification:
+
+OpenCV window titled “Interactive Navigation” appears
+
+Initial message: WAITING FOR ODOM
+
+Move the camera slowly until odometry initializes
+
+Step 2: Launch the Commander (Terminal 2)
+
+This starts the user interaction interface:
+```bash
+python3 src/scripts/commander.py
+```
+Step 3: Operation
+
+Mapping
+
+- Walk around the environment
+- System automatically builds a semantic map
+
+Navigation
+Type commands in Terminal 2:
+
+- find chair
+
+- navigate to laptop
+
+The system calculates vectors to the nearest matching object.
+Visualization (Terminal 1)
+
+- Green Bounding Boxes: Detected objects with persistent IDs
+
+- Green Arrow: Target found; follow arrow to reach it
+
+- Blue Arrow: Target not visible; points toward nearest landmark
+
+- HUD Display:
+
+- Query
+- Object ID
+- Distance (meters)
+- Global 3D coordinates
+- Current system action
+
+Step 4: Shutdown
+
+- Type stop in Terminal 2 to cancel navigation
+- Press Ctrl+C in Terminal 1
+
+Result:
+The semantic map is automatically saved to:
+```bash
+results/semantic_maps/latest_map.pkl
+```
+Final Status
+The Open-Vocabulary Semantic Navigation System is now a functional real-time prototype, capable of:
+
+- Open-vocabulary object detection
+- Real-time semantic mapping
+- Interactive navigation with visual feedback
+- Stable operation and clean shutdown behavior
+
+
+
+
+
