@@ -15,7 +15,7 @@
 6. [LiDAR Bag Data Collection (ROS2)](#6-lidar-bag-data-collection-ros2)  
 7. [RGB-D Camera SLAM Debugging & Bag Reconstruction](#7-rgb-d-camera-slam-debugging--bag-reconstruction)
 8. [SLAM Debugging Report: Semantic Mapping Failure Analysis](#8-slam-debugging-report-semantic-mapping-failure-analysis)
-
+9. [Open-Vocabulary Semantic Navigation System (Daily Progress Report)](#9-open-vocabulary-semantic-navigation-system-daily-progress-report)
 ---
 
 # 1. 3D LiDAR: Ouster OS1 Setup      
@@ -327,3 +327,138 @@ The synchronization errors make them **mathematically unusable** for 3D mapping.
  - Fully trusts the camera’s internal clock
 
 ---
+
+# 9. Open-Vocabulary Semantic Navigation System: Daily Progress Report
+**Date:** January 5, 2026  
+**Project Status:** Functional Real-Time Prototype  
+
+---
+
+## Executive Summary
+
+This session focused on transitioning the **Open-Vocabulary Semantic Navigation System** from constrained lab hardware to high-performance laptops in order to achieve **real-time operation**.
+
+The perception pipeline was successfully refactored by replacing the computationally heavy **SAM + CLIP** architecture with **YOLO-World (YOLOv8s-Worldv2)**. This change resulted in an approximate **30× performance improvement** while retaining open-vocabulary object detection capabilities.
+
+In parallel, the system architecture was stabilized by decoupling user interaction from the core ROS 2 execution loop, resolving persistent threading and shutdown crashes. The final system operates reliably at real-time frame rates and supports interactive semantic navigation with live visualization.
+
+---
+
+## Hardware Migration & Configuration
+
+### 2.1 Transition to Laptop Hardware
+
+**Issue:**  
+The lab-provided mini PCs lacked sufficient **CPU clock speed** and **GPU VRAM** to run the perception stack (originally SAM + CLIP) alongside ROS 2 middleware and RTAB-Map odometry.  
+Observed performance was below **1 FPS**, making real-time navigation infeasible.
+
+**Action:**  
+The entire system was migrated to personal laptops equipped with **dedicated NVIDIA GPUs**.
+
+**Result:**  
+- Stable real-time performance achieved  
+- Frame rates increased to **15–30 FPS**  
+- System capable of live perception, mapping, and navigation
+
+---
+
+### 2.2 USB Permission Hurdle (Orbbec Camera)
+
+**Issue:**  
+After migrating to the new Linux environment, the **Orbbec Femto Mega RGB-D camera** failed to initialize.  
+ROS 2 drivers reported *“Access Denied”* errors when attempting to open the USB 3.0 device.
+
+**Root Cause:**  
+Linux user permissions do not allow direct access to raw USB devices by default.
+
+**Solution:**  
+Standard **udev rules** were installed to grant user-group permissions for Orbbec devices.
+
+**Result:**  
+- Camera initializes without root privileges  
+- Stable access to RGB and depth streams  
+
+---
+
+## Algorithmic Pivot: From CLIP to YOLO-World
+
+### 3.1 The Bottleneck (SAM + CLIP)
+
+The original perception pipeline relied on:
+- **Segment Anything Model (SAM)** for segmentation
+- **CLIP** for zero-shot classification
+
+**Problems Identified:**
+- **Performance:** SAM required ~1–2 seconds per frame
+- **Latency:** Unsuitable for continuous navigation
+- **Accuracy:** Zero-shot classification prone to hallucinated labels in cluttered scenes
+- **Verdict:** Not viable for real-time robotic navigation
+
+---
+
+### 3.2 The Solution (YOLOv8s-Worldv2)
+
+The system was redesigned using **YOLO-World**, a real-time open-vocabulary object detector.
+
+**Advantages:**
+- **Open-Vocabulary:** Detects arbitrary objects using text prompts (e.g., “find chair”)
+- **Speed:** Runs at 30+ FPS on consumer GPUs
+- **Stability:** Consistent detections with temporal coherence
+
+**Integration Details:**
+- Implemented a custom wrapper (`yolo_detector.py`)
+- 2D bounding boxes projected into **global 3D coordinates** using depth data
+- Detections directly fed into the semantic mapping pipeline
+
+---
+
+## Architectural Overhaul: The "Commander" Pattern
+
+### 4.1 The Threading Crash
+
+**Symptoms:**  
+Frequent crashes during shutdown, including:
+
+
+**Root Cause:**  
+A blocking `input()` loop was executed inside the main ROS 2 node thread.  
+This conflicted with ROS 2 signal handling (`SIGINT`), causing deadlocks during shutdown.
+
+---
+
+### 4.2 The Two-Terminal Solution
+
+The system was refactored into **two independent ROS 2 nodes**, each running in a separate process.
+
+#### 1. Semantic System Node (Terminal 1)
+- Handles:
+  - Camera drivers
+  - Visual odometry (RTAB-Map)
+  - YOLO inference
+  - 3D semantic mapping
+- Visualizes:
+  - Bounding boxes
+  - Navigation arrows
+- Subscribes passively to `/navigation_command`
+
+#### 2. Commander Node (Terminal 2)
+- Lightweight Python script
+- Captures user text commands (e.g., “navigate to chair”)
+- Publishes commands to `/navigation_command`
+- Does not interfere with the main ROS 2 execution loop
+
+**Result:**  
+- Eliminated threading crashes  
+- Clean shutdown behavior  
+- Stable real-time execution  
+
+---
+
+## User Guide: How to Run the System
+
+### Prerequisites
+- Orbbec RGB-D camera connected via USB 3.0
+- Python virtual environment activated:
+```bash
+source .venv/bin/activate
+
