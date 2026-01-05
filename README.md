@@ -223,3 +223,107 @@ ros2 launch rtabmap_launch rtabmap.launch.py \
 ```
 ## Outcome
 - SLAM pipeline works; synchronized RGB-D frames, trajectory, and 3D point cloud displayed.
+
+## Executive Summary
+
+The **Semantic Mapping system** core logic has been verified as functional. However, the system fails to generate a 3D semantic map when using the provided **ROS 2 bag files**.
+
+### Key Finding
+The failure is caused by **severe data synchronization latency (~0.23 seconds)** between RGB and Depth streams inside the recorded data. This latency breaks the geometric consistency required by **Visual SLAM (RTAB-Map)**.
+
+### Conclusion
+The recorded ROS 2 bag files are **unsuitable for SLAM-based mapping**.  
+The system **must use real-time data** from the **Orbbec camera** to leverage hardware-level synchronization.
+
+---
+
+## Issue Description
+
+### Symptoms
+- Objects are detected correctly in **2D (RGB)**.
+- **0 objects** are saved in the **3D semantic map**.
+- Continuous warning logs:
+- Visualization shows an **empty map** with no landmarks.
+
+### Context
+- The system previously worked correctly using a **Fake Pose generator** (assumed positions).
+- Failure began after switching to **Real SLAM**, which enforces strict geometric and physical constraints.
+
+---
+
+## Technical Investigation & Root Cause Analysis
+
+### The "Chain of Trust" Failure
+
+The system operates on a dependency chain. If any stage fails, downstream components intentionally stop to preserve data integrity.
+
+1. **Camera Data (Images)** – OK  
+ Images are published correctly.
+
+2. **Odometry (The “Feet”)** – OK  
+ Relative movement (`odom → camera_link`) is computed correctly.
+
+3. **SLAM (The “Brain”)** – FAILED  
+ RTAB-Map cannot verify geometric consistency and refuses to publish the global transform (`map → odom`).
+
+4. **Semantic Mapper (The “Eyes”)** – BLOCKED  
+ Without the `map` frame, objects cannot be placed in 3D space.  
+ The system intentionally discards detections instead of placing them at `(0,0,0)`.
+
+---
+
+### Root Cause: Sensor Desynchronization
+
+Analysis of ROS 2 bag logs revealed a critical recording issue.
+
+#### Findings
+- **Timestamp Delta:** ~0.23 seconds delay between RGB and Depth images
+- **Impact:**  
+- RGB image represents **Time T**
+- Depth image represents **Time T − 0.23s**
+- **Result:**  
+Visual features (e.g., table edges) in RGB do not align with corresponding depth data.
+- **SLAM Response:**  
+RTAB-Map correctly rejects these frames to avoid corrupting the map.
+
+#### Likely Cause
+The Mini PC used for recording was likely **CPU overloaded**, causing delayed stream writes and breaking synchronization.
+
+---
+
+## Solutions Attempted
+
+### 1. Software Workarounds (Aggressive Tuning)
+- **Attempt:**  
+Increased SLAM synchronization tolerance  
+(`approx_sync_max_interval` from `0.02s` to `0.5s`)
+- **Result:**  
+Nodes ran without crashing, but the geometric mismatch remained too severe.  
+The map stayed empty.
+
+### 2. Configuration Fixes
+- **Attempt:**  
+Fixed a crash caused by sending Odometry parameters to the SLAM node.
+- **Result:**  
+Crash resolved, confirming node health.  
+Data quality issue persisted.
+
+---
+
+## Final Recommendation
+
+**Do NOT use the recorded ROS 2 bag files for SLAM development.**  
+The synchronization errors make them **mathematically unusable** for 3D mapping.
+
+### Action Plan
+
+1. **Switch to Live Hardware**
+ - Connect the **Orbbec Femto Mega** directly to the development laptop.
+ - Benefit from **hardware-level synchronization** (microsecond precision).
+
+2. **Use Real Hardware Launch File**
+ - Use `real_hardware.launch.py`
+ - Disables software hacks
+ - Fully trusts the camera’s internal clock
+
+---
