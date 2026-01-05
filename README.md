@@ -13,9 +13,8 @@
 4. [Orbbec RGB-D Camera Setup (ROS2 Jazzy)](#4-orbbec-rgb-d-camera-setup-ros2-jazzy)  
 5. [RGB-D Camera SLAM Challenge](#5-rgb-d-camera-slam-challenge)  
 6. [LiDAR Bag Data Collection (ROS2)](#6-lidar-bag-data-collection-ros2)  
-7. [RGB-D Camera SLAM Debugging & Bag Reconstruction](#7-rgb-d-camera-slam-debugging--bag-reconstruction)  
-8. [Summary](#8-summary)
-9. [SLAM Debugging Report (Semantic Mapping Failure Analysis)](#9-SLAM-Debugging-Report (Semantic Mapping Failure Analysis))
+7. [RGB-D Camera SLAM Debugging & Bag Reconstruction](#7-rgb-d-camera-slam-debugging--bag-reconstruction)
+8. [SLAM Debugging Report: Semantic Mapping Failure Analysis](#8-slam-debugging-report-semantic-mapping-failure-analysis)
 
 ---
 
@@ -224,7 +223,8 @@ ros2 launch rtabmap_launch rtabmap.launch.py \
 ## Outcome
 - SLAM pipeline works; synchronized RGB-D frames, trajectory, and 3D point cloud displayed.
 
-## Executive Summary
+# 8. SLAM Debugging Report: Semantic Mapping Failure Analysis
+Date: December 27, 2025
 
 The **Semantic Mapping system** core logic has been verified as functional. However, the system fails to generate a 3D semantic map when using the provided **ROS 2 bag files**.
 
@@ -326,5 +326,4 @@ The synchronization errors make them **mathematically unusable** for 3D mapping.
  - Disables software hacks
  - Fully trusts the camera’s internal clock
 
-Date: December 27, 2025
 ---
