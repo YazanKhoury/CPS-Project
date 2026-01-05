@@ -14,7 +14,8 @@
 5. [RGB-D Camera SLAM Challenge](#5-rgb-d-camera-slam-challenge)  
 6. [LiDAR Bag Data Collection (ROS2)](#6-lidar-bag-data-collection-ros2)  
 7. [RGB-D Camera SLAM Debugging & Bag Reconstruction](#7-rgb-d-camera-slam-debugging--bag-reconstruction)  
-8. [Summary](#8-summary)  
+8. [Summary](#8-summary)
+9. [SLAM Debugging Report (Semantic Mapping Failure Analysis)](#9-SLAM-Debugging-Report (Semantic Mapping Failure Analysis))
 
 ---
 
